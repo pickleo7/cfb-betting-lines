@@ -98,21 +98,41 @@ anyway.
 ## Merging into one row-per-game file
 
 ```bash
-python3 merge_weekly_lines.py --week 2      # one week
-python3 merge_weekly_lines.py --all          # every week found in data/
+export CFBD_API_KEY="your_cfbd_api_key"   # needed to resolve the "current week" alias
+python3 merge_weekly_lines.py --week 2 --cfbd-api-key "$CFBD_API_KEY"
+python3 merge_weekly_lines.py --all --cfbd-api-key "$CFBD_API_KEY"   # every week found in data/
 ```
 
-Writes `data/combined_week_NN.csv`: `consensus_home_spread` /
-`consensus_away_spread` / `consensus_total` are the **median** across
-whatever books posted a line for that game, sitting next to
-`circa_home_spread` / `circa_away_spread` / `circa_total`. Consensus
-and Circa can legitimately disagree on which side is favored — that's
-real line movement/divergence, not a bug (seen live: Circa opened
-Kansas -6.5 over Missouri, market had since moved to Missouri -6.5).
+Writes `data/combined_week_NN.csv`: one row per game with every
+individual book's `{Book}_home_spread` / `{Book}_away_spread` /
+`{Book}_total`, a `consensus_home_spread` / `consensus_away_spread` /
+`consensus_total` (the **median** across whatever books posted a line
+for that game), and `circa_home_spread` / `circa_away_spread` /
+`circa_total` alongside them. Consensus and Circa can legitimately
+disagree on which side is favored — that's real line movement/
+divergence, not a bug (seen live: Circa opened Kansas -6.5 over
+Missouri, market had since moved to Missouri -6.5).
+
+`--all` (and the GitHub Actions run) also refreshes
+`data/combined_current_week.csv` — always a copy of whichever week
+CFBD's calendar says is "now" (by date, not just the highest week
+number present in `data/`, since a book sometimes posts a game's line
+months ahead). This is the file the Google Sheet actually points at,
+so its URL never has to change week to week.
 
 ## Google Sheet
 
-A Google Sheet pulls `data/combined_week_NN.csv` on a schedule via
-Apps Script (`IMPORTDATA`-style fetch against
-`https://raw.githubusercontent.com/pickleo7/cfb-betting-lines/main/data/combined_week_NN.csv`).
-Run `merge_weekly_lines.py` and push to `main` to refresh it.
+A Google Sheet pulls `data/combined_current_week.csv` via a single
+`IMPORTDATA` formula:
+
+```
+=IMPORTDATA("https://raw.githubusercontent.com/pickleo7/cfb-betting-lines/main/data/combined_current_week.csv")
+```
+
+Paste that once into any cell — Google auto-refreshes `IMPORTDATA`
+roughly hourly, and since `combined_current_week.csv`'s *content*
+changes each week (not its filename), the formula never needs to be
+touched again. GitHub Actions keeps that file current automatically
+every Sunday; Circa's numbers still need the manual pipeline above,
+after which re-running `merge_weekly_lines.py --all` and pushing
+refreshes it mid-week too.

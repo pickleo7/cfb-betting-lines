@@ -44,6 +44,8 @@ jobs:
         run: python3 scrape_cfb_lines.py
 
       - name: Merge with any existing Circa data
+        env:
+          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
         run: python3 merge_weekly_lines.py --all
 
       - name: Commit and push updated data
