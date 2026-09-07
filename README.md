@@ -98,9 +98,8 @@ anyway.
 ## Merging into one row-per-game file
 
 ```bash
-export CFBD_API_KEY="your_cfbd_api_key"   # needed to resolve the "current week" alias
-python3 merge_weekly_lines.py --week 2 --cfbd-api-key "$CFBD_API_KEY"
-python3 merge_weekly_lines.py --all --cfbd-api-key "$CFBD_API_KEY"   # every week found in data/
+python3 merge_weekly_lines.py --week 2
+python3 merge_weekly_lines.py --all   # every week found in data/
 ```
 
 Writes `data/combined_week_NN.csv`: one row per game with every
@@ -113,26 +112,41 @@ disagree on which side is favored — that's real line movement/
 divergence, not a bug (seen live: Circa opened Kansas -6.5 over
 Missouri, market had since moved to Missouri -6.5).
 
-`--all` (and the GitHub Actions run) also refreshes
-`data/combined_current_week.csv` — always a copy of whichever week
-CFBD's calendar says is "now" (by date, not just the highest week
-number present in `data/`, since a book sometimes posts a game's line
-months ahead). This is the file the Google Sheet actually points at,
-so its URL never has to change week to week.
+`--all` (and the GitHub Actions run) also refreshes two more files:
+
+- **`data/combined_current_week.csv`** — a copy of whichever week has
+  the most upcoming (not yet kicked off) games, recomputed every run.
+  Deliberately not "highest week number seen" (a game's line sometimes
+  posts months ahead) or "soonest single upcoming game" (a lone
+  Sunday-night straggler from a nearly-finished week would beat a
+  fresh week's full 40+ game slate). This is the file the Sheet's
+  **Current Week** tab points at, so its URL never changes week to
+  week — only the content does.
+- **`data/opening_lines_archive.csv`** — append-only. The first time a
+  game is ever seen in a merged file, that row is written here
+  permanently and never overwritten again, unlike `week_NN.csv` (which
+  `scrape_cfb_lines.py` fully overwrites every Sunday with that week's
+  *latest* snapshot — so the true opener would otherwise be lost once
+  the line moves). This is the file the Sheet's **Historical** tab
+  points at.
 
 ## Google Sheet
 
-A Google Sheet pulls `data/combined_current_week.csv` via a single
-`IMPORTDATA` formula:
+Two tabs, each a single `IMPORTDATA` formula pasted once — Google
+auto-refreshes `IMPORTDATA` roughly hourly, and since both source
+files' *content* changes over time at the same URL, neither formula
+ever needs to be touched again:
 
+**Current Week** tab:
 ```
 =IMPORTDATA("https://raw.githubusercontent.com/pickleo7/cfb-betting-lines/main/data/combined_current_week.csv")
 ```
 
-Paste that once into any cell — Google auto-refreshes `IMPORTDATA`
-roughly hourly, and since `combined_current_week.csv`'s *content*
-changes each week (not its filename), the formula never needs to be
-touched again. GitHub Actions keeps that file current automatically
-every Sunday; Circa's numbers still need the manual pipeline above,
-after which re-running `merge_weekly_lines.py --all` and pushing
-refreshes it mid-week too.
+**Historical** tab:
+```
+=IMPORTDATA("https://raw.githubusercontent.com/pickleo7/cfb-betting-lines/main/data/opening_lines_archive.csv")
+```
+
+GitHub Actions keeps both current automatically every Sunday; Circa's
+numbers still need the manual pipeline above, after which re-running
+`merge_weekly_lines.py --all` and pushing refreshes both mid-week too.

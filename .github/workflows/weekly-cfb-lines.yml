@@ -3,8 +3,12 @@ name: Weekly CFB Betting Lines
 # Pulls NCAAF spread/moneyline/total odds from The Odds API, matches
 # each game to its real CFBD schedule entry, writes data/week_NN.csv,
 # then merges with whatever Circa data exists into
-# data/combined_week_NN.csv (the file the Google Sheet reads) every
-# Sunday morning.
+# data/combined_week_NN.csv, data/combined_current_week.csv (whichever
+# week has the most upcoming games -- what the Sheet's "Current Week"
+# tab reads), and data/opening_lines_archive.csv (append-only: each
+# game's first-ever-seen line, permanent even after week_NN.csv gets
+# overwritten by a later run -- what the Sheet's "Historical" tab
+# reads) every Sunday morning.
 #
 # Circa Sports is NOT available through The Odds API (or any odds
 # aggregator) -- Circa doesn't syndicate its lines anywhere public.
@@ -44,8 +48,6 @@ jobs:
         run: python3 scrape_cfb_lines.py
 
       - name: Merge with any existing Circa data
-        env:
-          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
         run: python3 merge_weekly_lines.py --all
 
       - name: Commit and push updated data

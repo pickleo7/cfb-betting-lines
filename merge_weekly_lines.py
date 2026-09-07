@@ -22,8 +22,6 @@ import statistics
 from datetime import datetime, timezone
 from pathlib import Path
 
-import requests
-
 SCRIPT_DIR = Path(__file__).resolve().parent
 DATA_DIR = SCRIPT_DIR / "data"
 
@@ -164,30 +162,77 @@ def discover_weeks() -> list[int]:
     return sorted(weeks)
 
 
-def determine_current_week(cfbd_api_key: str, season: int) -> int | None:
-    """The 'current' week is whichever CFBD calendar week contains today's
-    date (or the next upcoming one if today falls in a gap) -- NOT simply
-    the highest week number present in data/, since a book sometimes posts
-    a game's line far in advance (e.g. a November game already has a
-    week_12.csv while it's still Week 2)."""
-    resp = requests.get(
-        "https://api.collegefootballdata.com/calendar",
-        params={"year": season},
-        headers={"Authorization": f"Bearer {cfbd_api_key}"},
-        timeout=30,
-    )
-    resp.raise_for_status()
-    calendar = [w for w in resp.json() if w.get("seasonType") == "regular"]
+def update_opening_lines_archive(weeks: list[int]) -> None:
+    """data/opening_lines_archive.csv is append-only: the first time a
+    given cfbd_game_id is ever seen in a merged weekly file, that row is
+    the permanent record of its opening line, written here and never
+    touched again on later runs -- unlike week_NN.csv, which
+    scrape_cfb_lines.py fully overwrites every Sunday with that week's
+    latest snapshot (so week_NN.csv alone loses the true opener after the
+    line moves)."""
+    archive_path = DATA_DIR / "opening_lines_archive.csv"
+    existing = load_csv(archive_path)
+    existing_ids = {r["cfbd_game_id"] for r in existing if r.get("cfbd_game_id")}
+    columns = list(existing[0].keys()) if existing else None
+
+    new_rows = []
+    for week in weeks:
+        rows = load_csv(DATA_DIR / f"combined_week_{week:02d}.csv")
+        if not rows:
+            continue
+        if columns is None:
+            columns = list(rows[0].keys())
+        for row in rows:
+            game_id = row.get("cfbd_game_id")
+            if not game_id or game_id in existing_ids:
+                continue
+            new_rows.append(row)
+            existing_ids.add(game_id)
+
+    if not new_rows:
+        print("No new games to add to opening_lines_archive.csv.")
+        return
+
+    all_rows = existing + new_rows
+    all_rows.sort(key=lambda r: (r.get("cfbd_week") or "", r.get("commence_time") or ""))
+
+    with open(archive_path, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=columns, extrasaction="ignore")
+        writer.writeheader()
+        writer.writerows(all_rows)
+    print(f"Added {len(new_rows)} game(s) to {archive_path} (total {len(all_rows)})")
+
+
+def determine_current_week(weeks: list[int]) -> int | None:
+    """The 'current' week for the Sheet's front page is whichever week has
+    the most *upcoming* (not yet kicked off) games in what we've actually
+    scraped. Deliberately not: a CFBD calendar date range (Week 1's
+    Thu-Wed window is still "current" by date through Tuesday even after
+    nearly every Week 1 game has finished); the single soonest-upcoming
+    game (picks a lone Sunday-night straggler over a week with 40+ games
+    still to come, e.g. Week 1's last leftover game vs. Week 2's full
+    slate); or the highest week number present (a game's line sometimes
+    posts months ahead, e.g. week_12.csv existing during Week 2)."""
     now = datetime.now(timezone.utc)
-
-    for week_info in calendar:
-        start = datetime.fromisoformat(week_info["startDate"].replace("Z", "+00:00"))
-        end = datetime.fromisoformat(week_info["endDate"].replace("Z", "+00:00"))
-        if start <= now <= end:
-            return week_info["week"]
-
-    upcoming = [w for w in calendar if datetime.fromisoformat(w["startDate"].replace("Z", "+00:00")) > now]
-    return min(upcoming, key=lambda w: w["startDate"])["week"] if upcoming else None
+    upcoming_counts: dict[int, int] = {}
+    for week in weeks:
+        rows = load_csv(DATA_DIR / f"combined_week_{week:02d}.csv")
+        count = 0
+        for row in rows:
+            ct = row.get("commence_time")
+            if not ct:
+                continue
+            try:
+                commence = datetime.fromisoformat(ct.replace("Z", "+00:00"))
+            except ValueError:
+                continue
+            if commence > now:
+                count += 1
+        if count:
+            upcoming_counts[week] = count
+    if not upcoming_counts:
+        return None
+    return max(upcoming_counts, key=upcoming_counts.get)
 
 
 def update_current_week_alias(current_week: int) -> None:
@@ -205,14 +250,9 @@ def update_current_week_alias(current_week: int) -> None:
 
 
 def main():
-    import os
-    import sys
-
     parser = argparse.ArgumentParser(description="Merge mainstream-book and Circa lines into one row-per-game CSV.")
     parser.add_argument("--week", type=int, help="Merge a single week")
     parser.add_argument("--all", action="store_true", help="Merge every week found in data/")
-    parser.add_argument("--cfbd-api-key", default=os.environ.get("CFBD_API_KEY"), help="Needed to determine the current week for combined_current_week.csv")
-    parser.add_argument("--season", type=int, default=None)
     args = parser.parse_args()
 
     weeks = discover_weeks() if args.all else ([args.week] if args.week else [])
@@ -227,14 +267,11 @@ def main():
         else:
             print(f"No data found for week {week}, skipped")
 
-    if not args.cfbd_api_key:
-        print("No CFBD API key provided -- skipping combined_current_week.csv refresh.", file=sys.stderr)
-        return
+    update_opening_lines_archive(weeks)
 
-    season = args.season or datetime.now(timezone.utc).year
-    current_week = determine_current_week(args.cfbd_api_key, season)
+    current_week = determine_current_week(weeks)
     if current_week is None:
-        print("Could not determine current CFBD week -- skipping combined_current_week.csv refresh.", file=sys.stderr)
+        print("Could not determine current week (no upcoming games found) -- current-week alias not updated.")
         return
     update_current_week_alias(current_week)
 
