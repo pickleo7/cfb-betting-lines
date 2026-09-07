@@ -1,0 +1,55 @@
+name: Weekly CFB Betting Lines
+
+# Pulls NCAAF spread/moneyline/total odds from The Odds API, matches
+# each game to its real CFBD schedule entry, writes data/week_NN.csv,
+# then merges with whatever Circa data exists into
+# data/combined_week_NN.csv (the file the Google Sheet reads) every
+# Sunday morning.
+#
+# Circa Sports is NOT available through The Odds API (or any odds
+# aggregator) -- Circa doesn't syndicate its lines anywhere public.
+# Circa's own numbers come from a separate, manual pipeline (see
+# README.md's "Circa's actual opening lines" section) since their
+# weekly graphic needs a human/Claude to read it.
+#
+# Required repo secrets (Settings -> Secrets and variables -> Actions):
+#   ODDS_API_KEY   free key from https://the-odds-api.com (500 credits/month)
+#   CFBD_API_KEY   free key from https://collegefootballdata.com
+on:
+  schedule:
+    - cron: '0 13 * * 0' # Sun 8am ET -> Sun 13:00 UTC (EDT; shifts to 9am ET once EST starts in Nov)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run scraper
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+        run: python3 scrape_cfb_lines.py
+
+      - name: Merge with any existing Circa data
+        run: python3 merge_weekly_lines.py --all
+
+      - name: Commit and push updated data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git diff --cached --quiet || git commit -m "Weekly CFB lines snapshot $(date -u +%Y-%m-%d)"
+          git push
