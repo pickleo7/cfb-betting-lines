@@ -1,0 +1,58 @@
+pulled_at_utc,cfbd_game_id,cfbd_week,cfbd_season_type,home_team,away_team,matched_cfbd_schedule,circa_home_spread,circa_away_spread,circa_total
+2026-09-14T02:15:02.617974+00:00,401858225,3,regular,Pittsburgh,Syracuse,yes,-10,10,53.5
+2026-09-14T02:15:02.617974+00:00,401858226,3,regular,Wake Forest,Miami FL,yes,22.5,-22.5,55
+2026-09-14T02:15:02.617974+00:00,401856811,3,regular,Texas Tech,Houston,yes,-10,10,53
+2026-09-14T02:15:02.617974+00:00,401869940,3,regular,Delaware,Coastal Carolina,yes,-6,6,58.5
+2026-09-14T02:15:02.617974+00:00,401856812,3,regular,Kansas,Arizona State,yes,-4.5,4.5,55
+2026-09-14T02:15:02.617974+00:00,401858456,3,regular,Penn State,Buffalo,yes,-38,38,48
+2026-09-14T02:15:02.617974+00:00,401858454,3,regular,Ohio State,Kent State,yes,-51.5,51.5,58
+2026-09-14T02:15:02.617974+00:00,401858229,3,regular,Clemson,North Carolina,yes,-3.5,3.5,44.5
+2026-09-14T02:15:02.617974+00:00,401858451,3,regular,Minnesota,Akron,yes,-27,27,49
+2026-09-14T02:15:02.617974+00:00,401856792,3,regular,Kansas State,Tulane,yes,-19,19,49.5
+2026-09-14T02:15:02.617974+00:00,401856686,3,regular,Arkansas,Georgia,yes,26,-26,53
+2026-09-14T02:15:02.617974+00:00,401856798,3,regular,Iowa State,Bowling Green,yes,-23.5,23.5,46
+2026-09-14T02:15:02.617974+00:00,401860889,3,regular,Texas State,North Texas,yes,-3,3,63
+2026-09-14T02:15:02.617974+00:00,401858460,3,regular,Wisconsin,Eastern Michigan,yes,-24.5,24.5,46
+2026-09-14T02:15:02.617974+00:00,401856695,3,regular,Vanderbilt,NC State,yes,-4,4,52.5
+2026-09-14T02:15:02.617974+00:00,401856689,3,regular,Missouri,Troy,yes,-27,27,51
+2026-09-14T02:15:02.617974+00:00,401864508,3,regular,Central Michigan,Wyoming,yes,-1,1,39
+2026-09-14T02:15:02.617974+00:00,401862774,3,regular,Toledo,Temple,yes,-4,4,51.5
+2026-09-14T02:15:02.617974+00:00,401858230,3,regular,Louisville,SMU,yes,-2,2,61
+2026-09-14T02:15:02.617974+00:00,401856797,3,regular,Cincinnati,Miami (OH),yes,-14,14,48.5
+2026-09-14T02:15:02.617974+00:00,401858450,3,regular,Michigan,UTEP,yes,-37,37,49
+2026-09-14T02:15:02.617974+00:00,401858457,3,regular,Rutgers,USC,yes,24,-24,55.5
+2026-09-14T02:15:02.617974+00:00,401856685,3,regular,Alabama,Florida State,yes,-20,20,51
+2026-09-14T02:15:02.617974+00:00,401856694,3,regular,Texas A&M,Kentucky,yes,-15,15,48
+2026-09-14T02:15:02.617974+00:00,401856801,3,regular,Utah,Utah State,yes,-28,28,57
+2026-09-14T02:15:02.617974+00:00,401866422,3,regular,Liberty,Ball State,yes,-14,14,54
+2026-09-14T02:15:02.617974+00:00,401858231,3,regular,Duke,Stanford,yes,-10.5,10.5,50.5
+2026-09-14T02:15:02.617974+00:00,401858449,3,regular,Indiana,Western Kentucky,yes,-44,44,59
+2026-09-14T02:15:02.617974+00:00,401867804,3,regular,Baylor,Louisiana Tech,yes,-18,18,55
+2026-09-14T02:15:02.617974+00:00,401856691,3,regular,South Carolina,Mississippi State,yes,-3,3,59
+2026-09-14T02:15:02.617974+00:00,401862710,3,regular,ODU,East Carolina,yes,-1.5,1.5,49
+2026-09-14T02:15:02.617974+00:00,401862771,3,regular,FAU,FIU,yes,-7,7,61.5
+2026-09-14T02:15:02.617974+00:00,401864574,3,regular,App State,Charlotte,yes,-21,21,54
+2026-09-14T02:15:02.617974+00:00,401871047,3,regular,Missouri State,Marshall,yes,4,-4,52.5
+2026-09-14T02:15:02.617974+00:00,401856800,3,regular,UCF,Georgia State,yes,-20,20,50
+2026-09-14T02:15:02.617974+00:00,401856795,3,regular,Colorado State,BYU,yes,21,-21,52
+2026-09-14T02:15:02.617974+00:00,401869948,3,regular,Jacksonville State,Georgia Southern,yes,-4,4,52
+2026-09-14T02:15:02.617974+00:00,401864443,3,regular,Middle Tennessee State,Nevada,yes,6,-6,49
+2026-09-14T02:15:02.617974+00:00,401866423,3,regular,South Alabama,Ohio,yes,-3,3,53
+2026-09-14T02:15:02.617974+00:00,401862773,3,regular,Rice,Western Michigan,yes,11,-11,45.5
+2026-09-14T02:15:02.617974+00:00,401856687,3,regular,Auburn,Florida,yes,1.5,-1.5,53.5
+2026-09-14T02:15:02.617974+00:00,401861963,3,regular,Southern Miss,UConn,yes,3,-3,54
+2026-09-14T02:15:02.617974+00:00,401856802,3,regular,Virginia,West Virginia,yes,-8,8,54.5
+2026-09-14T02:15:02.617974+00:00,401858232,3,regular,Maryland,Virginia Tech,yes,3,-3,53
+2026-09-14T02:15:02.617974+00:00,401856796,3,regular,Northwestern,Colorado,yes,-3,3,47.5
+2026-09-14T02:15:02.617974+00:00,401856690,3,regular,Oklahoma,New Mexico,yes,-23.5,23.5,48
+2026-09-14T02:15:02.617974+00:00,401856688,3,regular,Ole Miss,LSU,yes,3,-3,59
+2026-09-14T02:15:02.617974+00:00,401858453,3,regular,Notre Dame,Michigan State,yes,-31,31,52
+2026-09-14T02:15:02.617974+00:00,401856692,3,regular,Tennessee,Kennesaw State,yes,-35.5,35.5,59
+2026-09-14T02:15:02.617974+00:00,401856799,3,regular,TCU,Arkansas State,yes,-20,20,56
+2026-09-14T02:15:02.617974+00:00,401856693,3,regular,Texas,UTSA,yes,-30,30,58
+2026-09-14T02:15:02.617974+00:00,401862776,3,regular,Louisiana,UAB,yes,-8.5,8.5,57.5
+2026-09-14T02:15:02.617974+00:00,401860887,3,regular,San Diego State,James Madison,yes,0,0,47
+2026-09-14T02:15:02.617974+00:00,401856793,3,regular,Arizona,Northern Illinois,yes,-35,35,49.5
+2026-09-14T02:15:02.617974+00:00,401864507,3,regular,Sacramento State,North Dakota State,yes,28,-28,53
+2026-09-14T02:15:02.617974+00:00,401860888,3,regular,San Jose State,Fresno State,yes,8.5,-8.5,51.5
+2026-09-14T02:15:02.617974+00:00,401858458,3,regular,UCLA,Purdue,yes,-14,14,52.5
